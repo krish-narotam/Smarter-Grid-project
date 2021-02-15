@@ -1,0 +1,61 @@
+package test1;
+
+public class EnvironmentTest {
+	
+
+	
+	  public static void main(String[] args)
+	  {
+		EasyReader kboard = new EasyReader();
+	    
+	    
+	    // get the usages of the different houses from the data file
+	    
+	    System.out.println("Smarter Grid 1.0");
+	 
+	    
+	    System.out.println("Number of houses?");
+	    int numOfHouses = kboard.readInt();
+	    System.out.println("Number of Commercial Establishments?");
+	    int numOfComs = kboard.readInt();
+	    System.out.println("Simulating the grid for how many months?");
+	    int time = kboard.readInt();
+	    System.out.println("Enter Data file with the weather patterns for the area;");
+	    String file = kboard.readLine();
+	    
+	    //configure the data files
+	    EasyReader usageHouse = new EasyReader();
+	    EasyReader usageComs = new EasyReader();
+	    
+	    
+	    
+	    //solar conditions creation
+	    int[] solar = new int[24];
+	    
+	    //usages based on time of day in KiloWatt hours
+	    int[] houseUsage = {0,30, 29, 28, 28, 27, 28, 29, 29, 29, 31, 30, 29, 29, 28, 28, 29, 29, 30, 32, 33, 32, 31, 30, 29}; 
+	    double[] outputOfSolar = {0,0,0,0,0,0,.1, .25, .4, .7, .75, .9, 1, 1, .25, .25, .4, .4, .1, 0, 0, 0,0,0,0};
+	    double [] outputOfWind = {0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,2, 2, 2, 2, 0, 0};
+      
+	    int priceOfWind = 2000;
+	    int pricePerSqM = 100;
+      
+      //create environment and input solar conditions
+	    Environment e1 = new Environment(outputOfSolar, numOfHouses, numOfComs);
+	    
+	   
+      
+	    System.out.println("Results:");
+	    System.out.println("Number of meters squared of Solar Panels:");
+	    System.out.println("Number of Houses with Solar Panels:");
+	    System.out.println("Number of Commercial Establishments with Solar Panels:");
+	    System.out.println("Number of Individual Wind turbines:");
+	    System.out.println("Number of Houses with Wind turbines:");
+	    System.out.println("Number of Commercial Establishments with Wind Turbines:");
+	    System.out.println("Average Cost per House");
+	    System.out.println("Average Cost per Commercial Establishment");
+	   
+
+	  }
+}
+
