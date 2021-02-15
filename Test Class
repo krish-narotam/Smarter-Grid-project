@@ -1,0 +1,115 @@
+package test2;
+
+
+	public class Test 
+
+	{
+
+		public static void main (String[] args)
+		{
+      //blade length
+			double  blade = 1;
+      // metrics required for power calculation
+			double airdense = 1.23; 
+      //a coeffiecient that is specific to every turbine
+			double powercof= 0.4;
+      // sweep area covered by the blades
+			double area = blade*(Math.PI);
+      
+      
+			double[] houseUsage = {0,1.5, 1.3, 1.2, 1.2, 1, 1.2, 1.3, 1.3, 1.4, 1.6, 1.5, 1.3, 1.3, 1.2, 1.2, 1.3, 1.3, 1.2, 1.6, 1.7, 1.7, 1.6, 1.5, 1.3}; 
+		    double[] outputOfSolar = {0,0,0,0,0,0,.1, .25, .4, .7, .75, .9, 1, 1, .25, .25, .4, .4, .1, 0, 0, 0,0,0,0};
+		    double [] outputOfWind = new double [25];
+		    double [] wind = new double [25];
+		    String [] cloud = new String [25];
+		    String [] time = new String [25];
+      
+   		  
+       //configure the data files to be read
+		    EasyReader windred = new EasyReader("WindShare");
+		    EasyReader timered = new EasyReader("Time");
+		    EasyReader cloudred = new EasyReader("CloudConditions"); 
+		    
+
+		    
+		    for (int i =0; i<24; i++)
+		    {
+		    	
+		    	int input = windred.readInt();
+		    		wind[i]= 0.44704 * (double)(input);
+		    	
+		    	
+		    
+		    	String cloudtemp = "";
+		    	cloudtemp = cloudred.readLine();
+		    	//System.out.println(cloudtemp);
+		    	if (cloudtemp!= null )
+		    	{
+		    		if (cloudtemp.charAt(0)!= ' ')
+		    		{
+		    		String temp = "";
+		    		for (int u=0; u<3; u++)
+		    		{
+		    			temp = temp + cloudtemp.charAt(u);
+		    		}
+		    		cloud[i] = temp;
+		    		
+		    		}
+		    		
+		    	}
+		    	
+		    	else 
+		    	{
+		    		cloudred.readLine();
+		    	}
+		    	
+		    	String timetemp = timered.readLine();
+		    
+		    	
+		    	if (timetemp != null && !(timetemp.substring(0,4).equals("    ")))
+		    	{
+		    		time[i] = timetemp.substring(12,19);
+		    	}
+		    	else 
+		    	{
+		    		timered.readLine();
+		    	}
+
+		    }
+		    
+		    
+		    // calculates windoutput based on windspeed for each time element of the array
+		    for (int i =0; i<24; i++) 
+		    {
+		    	
+		    	outputOfWind[i] = (0.5) * (airdense) *( area)* (powercof) * Math.pow(wind[i], 3); //https://www.raeng.org.uk/publications/other/23-wind-turbine
+
+		    }
+//int numOfTrials = 10;
+		    Grid test = new  Grid(houseUsage,  outputOfSolar,  outputOfWind);
+		    test.setSolar( cloud, .2, 20, .166);
+		    //this increments each example
+		    int priceOfWind = 2000;
+		    int pricePerSqM = 100;
+			   
+			   
+			   
+			   // this increments the display
+		    for (int x = 1 ; x  <  2000 ; x++)
+		    {
+		    int numofhouses = x; 
+		    int[] ans = new int[3];
+		    ans =  test.calcOutput(numofhouses);
+//		    System.out.print(ans[1]  * priceOfWind+ " dollars   ");
+//		    System.out.print(ans[2]  * pricePerSqM + " dollars  ");
+//		    
+//		    System.out.println("Estimated costs");
+		    System.out.println((ans[1]  * priceOfWind)/numofhouses + (ans[2]  * pricePerSqM)/numofhouses );
+		    ans = test.calcOutput(0);
+		    }
+		}
+
+		
+
+	}
+
