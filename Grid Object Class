@@ -1,0 +1,170 @@
+package test2;
+
+public class Grid 
+{
+	double[] usage;
+	double[] solarOutput;
+	double[] windOutput;
+	double[] reseter;
+	
+	final int SOLAR_CONSTANT = 1370;
+	final int RADIUS_OF_EARTH = 6378;
+	
+	public Grid(double[] usage , double[] solar , double[] wind)
+	{
+//		usage = new int[25];
+//		solarOutput = new double[25]; 
+//		windOutput = new double[25];
+		this.usage = usage;
+		reseter = usage;
+		solarOutput = solar;
+		windOutput = wind;
+	}
+	
+	
+	public int[] calcOutput(int num )
+	{
+		// index 0 — number of square feet of solar
+		// index 1 - number of wind turbines
+		int[] ans = {0,0, 0};
+		int[] surplusHours = new int[25];
+		double maxUse = Integer.MIN_VALUE;
+		double  minWind = Integer.MAX_VALUE;
+		double minSolar = Integer.MAX_VALUE;
+		double avg = 0;
+		double offSurplus = 0; 
+		for ( int x = 0 ; x < 25 ;x ++)
+		{
+			double input = Math.round(Math.random() * 2 - 1);
+			usage[x] =  (reseter[x] +(input) * (Math.random() * .1 )) * num    ;
+
+		}
+		//Determine the Max
+		for ( int x = 1 ; x < usage.length ; x++)
+		{
+			if  ( windOutput[x]  < 2 && solarOutput[x]  < 1 )
+			{
+				surplusHours[x] = -1;
+				
+			}
+			if ( usage[x] > maxUse)
+			{
+				maxUse = usage[x];
+				
+			}
+			if ((windOutput[x] != 0) && (windOutput[x] < minWind))
+			{
+				minWind =  windOutput[x];
+			}
+			if  ( (solarOutput[x] != 0) && (solarOutput[x] < minSolar))
+			{
+				minSolar  = solarOutput[x];
+			}
+			//it finds the middle for entire  thing by finding  the  average
+			avg = avg + usage[x];
+		}
+		
+			avg  = avg / (usage.length- 1);
+			//calcs the number of wind turbines  needed 
+			ans[0] = (int)(avg / minWind) + 1;
+			//calcs the number of solar panels needed
+			ans[1] = (int)( (maxUse - avg)/ minSolar );
+			int numHours =  0; 
+			for ( int  x  = 1 ; x < surplusHours.length  ; x++)
+			{
+				if  ( surplusHours[x] ==  -1)
+				{
+					offSurplus =  offSurplus +  usage[x]; 
+					numHours++;
+					
+				}
+			}
+			//calc battery storage for a day
+			
+			for (int x = 1 ; x < usage.length ; x++)
+			{
+				ans[2] = ans[2] + (int)((ans[0] * windOutput[x]) + (ans[1] * solarOutput[x]) -usage[x]);
+			}
+
+			ans[0]  = ans[0]  + (int)((  offSurplus  / (usage.length -   1  -  numHours))/minWind);
+		
+			
+		if (!works(ans))
+		{
+			ans[0] = 0;
+			ans[1] = 0;
+			ans[2] = 0;
+		}
+		
+		return ans;
+
+	}
+
+
+	public boolean works(int[] ans)
+	{
+		boolean doeswork = true;
+		int count = 0 ;
+		for ( int x = 0 ; x < usage.length ; x++)
+		{
+			int produc = (int)((windOutput[x] * ans[0]) + (solarOutput[x] * ans[1]) + ans[2]);
+			if (usage[x] < produc + ans[2])
+			{
+//				System.out.println("wind: " + windOutput[x] + " num of turbines" + ans[0]);
+//				System.out.println("solar: " + solarOutput[x] + " num of panels: " + ans[1]);
+				ans[2] = (int)(ans[2] - (usage[0] - ((windOutput[x] * ans[0]) + (solarOutput[x] * ans[1]))));
+			}
+			else 
+			{
+				count++;
+			}
+			
+			
+		}
+		if ( count > 0)
+		{
+			doeswork = false;
+		}
+		usage = reseter;
+		return doeswork;
+	}
+	
+	public void setSolar( String[] cloudcover, double humidity , double temp , double albedo)
+	{
+	
+		// Cloud cover in the Oktas
+		String[] clco = cloudcover;
+		//Reflectiveness of the solar panel surface
+		double r = albedo;
+		// Solar panel rated capacity in kW
+		double solarrating  = .01; 
+		// Efficiency based on manufacture number 
+		double solarefficiency = .2; 
+		double cc = 0;
+		for ( int x = 1 ; x < 24 ; x++)
+		{
+			if  (clco[x].equals("FEW"))
+			{
+				cc = .8;
+			}
+			else if (clco[x].equals("SCT"))
+			{
+				cc  = .6;
+			}
+			else if(clco[x].equals("CLR"))
+			{
+				cc =  1;
+			}
+			else if (clco[x].equals("BKN"))
+			{
+				cc = .4;
+			}
+		double solarEnergyFlux = (cc)*((SOLAR_CONSTANT * r));
+		
+		solarOutput[x] = solarEnergyFlux * solarrating * solarefficiency;
+		
+		
+		}
+		
+	}
+}
