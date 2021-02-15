@@ -1,0 +1,102 @@
+package test1;
+
+// This structure allows for the quick changes to the code structure so that we can add parts and different functions easily. 
+import java.util.HashMap;
+
+public class Environment 
+{
+	/**
+	  'Houses' are the residential Units
+	  'Coms' are the commercial establishments
+	  IDS are established based on when they are logged in an arbitrary arragnement. 
+	  Usage will be based on the hour and have 24 entries in every array (24 hours in a day)
+    
+    Type will be a String that says "Photo", "Wind", "Water", and  "Geo". 
+    	- Photo = Photovoltaics
+    	- Wind = Wind Turbines
+    	- Water = Hydropower
+    	- Geo = Geothermal
+	  **/
+  
+  //variables that house the number of units in community
+  private int numOfHouses;
+  private int numOfComs;
+  
+  //Instantiation of the different maps for the data
+  private HashMap<Integer, int[]> houseUsage = new HashMap<>();
+  private HashMap<Integer, String> houseType = new HashMap<>();
+  private HashMap<Integer, int[]> comUsage = new HashMap<>();
+  private HashMap<Integer, String> comType = new HashMap<>();
+  
+  /**
+  This allows us to check and verify that the amount of energy being 
+  drawn at any given second is going to be the same that is being produced.
+  **/
+  
+  private double[] totalDemandArr = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+  private double[] totalSupplyArr = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+  
+  private double totalDemand;
+  private double totalSupply;
+  
+  //we will need to find a way to make this accurate depending on the region or something
+  private double[] photoOutput;
+  
+  
+  public Environment(double[] solarConditions, int numOfHouses, int numOfComs)
+	{
+		this.numOfHouses = numOfHouses;
+		this.numOfComs = numOfComs;
+		photoOutput = solarConditions;
+	}
+
+  public void addWind(double [] wind)
+  {
+    for (int i = 0 ; i < wind.length ; i++)
+    {
+     	totalSupplyArr[i]= wind[i];
+    }
+  }
+  
+  
+  public int getPanels( double [] used, double [] generated)
+  {
+    int panels =0; 
+    int sumuse=0;
+    int sumgen=0;
+    
+    for (int i=0; i<used.length; i++)
+    {
+      sumuse+=used[i];
+    }
+    for (int i=0; i< generated.length; i++)
+    {
+      sumgen+= generated[i];
+    }
+    panels = sumuse / sumgen;
+    return panels;
+    
+  }
+  
+  
+public boolean isFunction()
+  {
+	  //compile all of the supplies and demands at all hours
+	  for(int n = 0; n == 24; n++)
+	  {
+	  totalSupply = totalSupply + totalSupplyArr[n];
+	  totalDemand = totalDemand + totalDemandArr[n];
+	  }
+  
+	  boolean ans = true;
+	  if (totalDemand > totalSupply)
+	  {
+		  ans = false;
+	  }
+	  return ans;
+  }
+  
+
+  }
+
+
